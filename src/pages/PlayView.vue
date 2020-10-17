@@ -28,70 +28,28 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue'
+import {  watch } from 'vue'
 import QuestionsWindow from '../components/QuestionsBar.vue'
 import PlayWindow from '../components/Game.vue'
 import PlayLayout from '../components/PlayLayout.vue'
-import {REWARDS, STATUSES} from '../const'
-import {getQuestions} from '../api';
-import {delay} from '../utils';
+import {STATUSES} from '../const'
 import {useRouter} from 'vue-router';
+import {useQuiz} from '../logic';
 
 export default {
   components: { QuestionsWindow, PlayWindow, PlayLayout },
   setup() {
     const router = useRouter()
+    const {initQuiz, ...quizProps} = useQuiz()
 
-    const cash = ref(0)
-    const currentRound = ref(null)
-    const status = ref(STATUSES.NOT_STARTED)
-    const rawQuestions = ref([])
-
-    const maxRounds = computed(() => Math.min(REWARDS.length, rawQuestions.value.length))
-    const questions = computed(() => rawQuestions.value
-      .slice(0, maxRounds.value)
-      .map((q, number) => ({
-        ...q,
-        reward: REWARDS[number],
-        isAnswered: number < currentRound.value
-      }))
-    )
-    const currentQuestion = computed(() => questions.value[currentRound.value])
-
-    watch(status, curr => {
+    watch(quizProps.status, curr => {
       if (curr === STATUSES.WON) router.push({name: 'won'})
       if (curr === STATUSES.LOST) router.push({name: 'lost'})
     })
 
-    getQuestions(10).then(questions => {
-      currentRound.value = 0
-      rawQuestions.value = questions
-      status.value = STATUSES.PLAYING
-    })
+    initQuiz()
 
-    const submitAnswer = answerNumber => delay(Math.random() * 500 + 500)
-      .then(() => {
-        if (currentQuestion.value.correctAnswer === answerNumber) {
-          cash.value = currentQuestion.value.reward
-          if (currentRound.value < maxRounds.value) currentRound.value += 1
-          if (currentRound.value + 1 === maxRounds.value) {
-            status.value = STATUSES.WON
-          }
-        } else {
-        status.value = STATUSES.LOST
-      }
-     })
-
-    return {
-      cash,
-      currentRound,
-      status,
-      rawQuestions,
-      maxRounds,
-      questions,
-      currentQuestion,
-      submitAnswer
-    }
+    return quizProps
   }
 }
 </script>
