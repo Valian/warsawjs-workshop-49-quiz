@@ -10,48 +10,53 @@
 
     <template #main>
       <transition name="flip" mode="out-in">
-        <play-window
+        <PlayWindow
           class="box"
           :currentQuestion="currentQuestion"
           :key="currentRound"
           @submit="submitAnswer">
-        </play-window>
+        </PlayWindow>
       </transition>
     </template>
 
     <template #side>
-      <questions-window
+      <QuestionsWindow
         :questions="questions.slice().reverse()">
-      </questions-window>
+      </QuestionsWindow>
     </template>
   </PlayLayout>
 </template>
 
-<script>
-import {  watch } from 'vue'
-import QuestionsWindow from '../components/QuestionsBar.vue'
-import PlayWindow from '../components/Game.vue'
-import PlayLayout from '../components/PlayLayout.vue'
+<script setup>
+export {default as QuestionsWindow} from '../components/QuestionsBar.vue'
+export {default as PlayWindow} from '../components/Game.vue'
+export {default as PlayLayout} from '../components/PlayLayout.vue'
+
 import {STATUSES} from '../const'
 import {useRouter} from 'vue-router';
 import {useQuiz} from '../logic';
+import {watch} from 'vue'
 
-export default {
-  components: { QuestionsWindow, PlayWindow, PlayLayout },
-  setup() {
-    const router = useRouter()
-    const {initQuiz, ...quizProps} = useQuiz()
 
-    watch(quizProps.status, curr => {
-      if (curr === STATUSES.WON) router.push({name: 'won'})
-      if (curr === STATUSES.LOST) router.push({name: 'lost'})
-    })
+const router = useRouter()
+export const {
+  cash,
+  currentRound,
+  status,
+  maxRounds,
+  questions,
+  currentQuestion,
+  submitAnswer,
+  initQuiz
+} = useQuiz()
 
-    initQuiz()
+watch(status, curr => {
+  if (curr === STATUSES.WON) router.push({name: 'won'})
+  if (curr === STATUSES.LOST) router.push({name: 'lost'})
+})
 
-    return quizProps
-  }
-}
+initQuiz()
+
 </script>
 
 <style>

@@ -48,7 +48,6 @@ export const useQuiz = () => {
     cash,
     currentRound,
     status,
-    rawQuestions,
     maxRounds,
     questions,
     currentQuestion,

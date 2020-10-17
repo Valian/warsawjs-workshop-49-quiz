@@ -18,13 +18,7 @@
   </div>
 </template>
 
-<script>
-import {useQuiz} from '../logic';
-
-export default {
-  setup() {
-    const {currentQuestion} = useQuiz()
-    return {currentQuestion}
-  }
-}
+<script setup>
+import { useQuiz } from '../logic';
+export const {currentQuestion} = useQuiz()
 </script>
