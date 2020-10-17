@@ -14,7 +14,7 @@ export function loadingWrapper (promise, { loadingVar, errorVar }) {
     loading: ['getFromApi'],
     methods: {
       getFromApi() {
-        return this.$store.dispatch('getFromAPI')  // function must return promise!
+        return axios.get(...)  // function must return promise!
       }
     },
   }

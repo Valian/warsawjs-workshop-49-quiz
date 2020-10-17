@@ -1,13 +1,13 @@
 <template>
   <div class="has-text-centered box">
     <h1 class="title">Incorrect answer, you lost!</h1>
-    <h2 class="subtitle" v-if="correctAnswer">
-      Correct answer: <span v-html="correctAnswer"></span>
+    <h2 class="subtitle">
+      Correct answer: TODO
     </h2>
     <hr>
     <div class="columns">
       <div class="column">
-        <start-game-button class="is-fullwidth" label="Try again"></start-game-button>
+        <button class="button is-fullwidth" @click="$router.push({name: 'play'})">Try again</button>
       </div>
       <div class="column">
         <router-link
@@ -19,21 +19,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import StartGameButton from '../components/StartGameButton.vue'
-  import { mapGetters } from 'vuex'
-
-  export default {
-    components: { StartGameButton },
-    computed: {
-      ...mapGetters({
-        status: 'status',
-        currentQuestion: 'currentQuestion'
-      }),
-      correctAnswer () {
-        return this.status === 'lost' && this.currentQuestion.answers[this.currentQuestion.correctAnswer]
-      }
-    }
-  }
-</script>

@@ -1,11 +1,11 @@
 <template>
-  <div class="c-won-window o-vertical-fill has-text-centered box">
+  <div class="o-vertical-fill has-text-centered box">
     <h1 class="title o-vertical-fill__item">Congratulations, you won!</h1>
-    <h1 class="title o-vertical-fill__item">Your reward: {{ reward }}$</h1>
+    <h1 class="title o-vertical-fill__item">Your reward: TODO</h1>
     <hr>
     <div class="columns">
       <div class="column">
-        <start-game-button class="is-fullwidth" label="Restart"></start-game-button>
+        <button class="button is-fullwidth" @click="$router.push({name: 'play'})">Play again</button>
       </div>
       <div class="column">
         <router-link
@@ -17,20 +17,3 @@
     </div>
   </div>
 </template>
-
-<script>
-  import StartGameButton from '../components/StartGameButton.vue'
-  import { mapGetters } from 'vuex'
-
-  export default {
-    components: { StartGameButton },
-    computed: mapGetters({
-      reward: 'cash'
-    })
-  }
-</script>
-
-<style lang="scss">
-  .c-won-window {
-  }
-</style>

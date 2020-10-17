@@ -22,7 +22,6 @@
           v-for="(answer, number) in currentQuestion.answers">
           <button
             class="c-game__answer button is-large is-primary is-fullwidth"
-            :disabled="loading"
             v-html="answer">
           </button>
         </div>
@@ -38,10 +37,6 @@
         type: Object,
         required: true
       },
-      loading: {
-        type: Boolean,
-        required: true
-      }
     },
     emits: ['submit']
   }

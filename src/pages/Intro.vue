@@ -4,16 +4,6 @@
       <div>
         <img src="/logo.png">
       </div>
-      <start-game-button class="is-fullwidth">PLAY</start-game-button>
+      <button class="button is-fullwidth" @click="$router.push({name: 'play'})">PLAY</button>
     </div>
 </template>
-
-<script>
-import StartGameButton from '../components/StartGameButton.vue';
-
-export default {
-  components: {
-    StartGameButton
-  }
-}
-</script>

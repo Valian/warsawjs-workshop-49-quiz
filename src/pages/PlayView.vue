@@ -1,5 +1,6 @@
 <template>
-  <PlayLayout>
+  <div class="box is-fullwidth title" v-if="currentRound === null">Loading...</div>
+  <PlayLayout v-else>
     <template #title>
       <div class="has-text-centered">
         <h1 class="title">Currently won: <strong>{{ $filters.currency(cash) }}</strong></h1>
@@ -12,7 +13,6 @@
         <play-window
           class="box"
           :currentQuestion="currentQuestion"
-          :loading="submitAnswerLoading"
           :key="currentRound"
           @submit="submitAnswer">
         </play-window>
@@ -31,18 +31,66 @@
   import QuestionsWindow from '../components/QuestionsBar.vue'
   import PlayWindow from '../components/Game.vue'
   import PlayLayout from '../components/PlayLayout.vue'
-  import { mapGetters } from 'vuex'
-  import { STATUSES } from '../const'
+  import {REWARDS, STATUSES} from '../const'
+  import {getQuestions} from '../api';
+  import {delay} from '../utils';
 
   export default {
     components: { QuestionsWindow, PlayWindow, PlayLayout },
-    loading: ['submitAnswer'],
     created() {
-      if (this.currentRound === null) this.$router.replace('/')
+      if (this.currentRound === null) this.initGame()
+    },
+    data() {
+      return {
+        cash: 0,
+        currentRound: null,
+        status: STATUSES.NOT_STARTED,
+        rawQuestions: []
+      }
+    },
+    computed: {
+      maxRounds() {
+        return Math.min(REWARDS.length, this.questions.length)
+      },
+      questions() {
+        return this.rawQuestions
+        .slice(0, this.maxRounds)
+        .map((q, number) => ({
+          ...q,
+          reward: REWARDS[number],
+          isAnswered: number < this.currentRound
+        }))
+      },
+      currentQuestion() {
+        return this.questions[this.currentRound]
+      }
     },
     methods: {
+      initGame() {
+        return getQuestions(10).then(questions => {
+          this.cash = 0
+          this.currentRound = 0
+          this.rawQuestions = questions
+          this.status = STATUSES.PLAYING
+        })
+      },
+      answerQuestion(answerNumber) {
+        return delay(Math.random() * 500 + 500).then(() => {
+          if (this.currentQuestion.correctAnswer === answerNumber) {
+            this.cash = this.currentQuestion.reward
+            if (this.currentRound < this.maxRounds) {
+              this.currentRound += 1
+            }
+            if (this.currentRound + 1 === this.maxRounds) {
+              this.status = STATUSES.WON
+            }
+          } else {
+            this.status = STATUSES.LOST
+          }
+        })
+      },
       submitAnswer (number) {
-        return this.$store.dispatch('answerQuestion', number)
+        return this.answerQuestion(number)
           .then(() => {
             if (this.status === STATUSES.WON) {
               this.$router.push({name: 'won'})
@@ -52,15 +100,7 @@
             }
           })
       }
-    },
-    computed: mapGetters({
-      status: 'status',
-      currentRound: 'currentRound',
-      currentQuestion: 'currentQuestion',
-      questions: 'questions',
-      cash: 'cash',
-      maxRounds: 'maxRounds'
-    })
+    }
   }
 </script>
 
