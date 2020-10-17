@@ -30,16 +30,19 @@
 <script>
   import QuestionsWindow from '../components/QuestionsBar.vue'
   import PlayWindow from '../components/Game.vue'
-  import PlayLayout from './PlayLayout.vue'
+  import PlayLayout from '../components/PlayLayout.vue'
   import { mapGetters } from 'vuex'
   import { STATUSES } from '../const'
 
   export default {
     components: { QuestionsWindow, PlayWindow, PlayLayout },
     loading: ['submitAnswer'],
+    created() {
+      if (this.currentRound === null) this.$router.replace('/')
+    },
     methods: {
       submitAnswer (number) {
-        return this.$store.dispatch('quiz/answerQuestion', number)
+        return this.$store.dispatch('answerQuestion', number)
           .then(() => {
             if (this.status === STATUSES.WON) {
               this.$router.push({name: 'won'})
@@ -51,12 +54,12 @@
       }
     },
     computed: mapGetters({
-      status: 'quiz/status',
-      currentRound: 'quiz/currentRound',
-      currentQuestion: 'quiz/currentQuestion',
-      questions: 'quiz/questions',
-      cash: 'quiz/cash',
-      maxRounds: 'quiz/maxRounds'
+      status: 'status',
+      currentRound: 'currentRound',
+      currentQuestion: 'currentQuestion',
+      questions: 'questions',
+      cash: 'cash',
+      maxRounds: 'maxRounds'
     })
   }
 </script>

@@ -10,7 +10,8 @@
 </template>
 
 <script>
-  export default {
+import { defineComponent } from 'vue'
+  export default defineComponent({
     props: {
       label: {
         type: String,
@@ -20,9 +21,9 @@
     loading: ['tryAgain'],
     methods: {
       tryAgain () {
-        return this.$store.dispatch('quiz/initGame')
+        return this.$store.dispatch('initGame')
           .then(() => this.$router.push({name: 'play'}))
       }
     }
-  }
+  })
 </script>

@@ -11,7 +11,7 @@
       </div>
       <div class="column">
         <router-link
-          :to="{name: 'game'}"
+          :to="{name: 'intro'}"
           class="button is-fullwidth">
           Main menu
         </router-link>
@@ -28,8 +28,8 @@
     components: { StartGameButton },
     computed: {
       ...mapGetters({
-        status: 'quiz/status',
-        currentQuestion: 'quiz/currentQuestion'
+        status: 'status',
+        currentQuestion: 'currentQuestion'
       }),
       correctAnswer () {
         return this.status === 'lost' && this.currentQuestion.answers[this.currentQuestion.correctAnswer]

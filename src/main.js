@@ -2,10 +2,9 @@ import { createApp } from 'vue'
 import store from './store'
 import router from './router';
 import App from './App.vue'
-import Loading from './common/Loading.vue'
+import Loading from './components/Loading.vue'
 import {currencyFilter, loadingMixin} from './utils'
 import 'font-awesome/fonts/fontawesome-webfont.woff2';
-import './index.css'
 
 const app = createApp(App)
 

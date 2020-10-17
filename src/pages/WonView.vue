@@ -9,7 +9,7 @@
       </div>
       <div class="column">
         <router-link
-          :to="{name: 'game'}"
+          :to="{name: 'intro'}"
           class="button is-fullwidth">
           Main menu
         </router-link>
@@ -25,7 +25,7 @@
   export default {
     components: { StartGameButton },
     computed: mapGetters({
-      reward: 'quiz/cash'
+      reward: 'cash'
     })
   }
 </script>

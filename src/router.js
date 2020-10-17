@@ -1,41 +1,40 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import store from './store'
-import Intro from './common/Intro.vue'
-import quizRoutes from './apps/quiz/routes'
-import adminRoutes from './apps/settings/routes'
-
+import Intro from './pages/Intro.vue'
+import Play from './pages/PlayView.vue'
+import WonView from './pages/WonView.vue'
+import LostView from './pages/LostView.vue'
+import NarrowLayout from './components/NarrowLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      name: 'intro',
-      component: Intro,
-      path: '/'
+      name: 'play',
+      component: Play,
+      path: '/play',
     },
-    ...quizRoutes,
-    ...adminRoutes
-  ]
-})
-
-router.beforeEach((to, from, next) => {
-  const routeMeta = to.matched
-    .filter(record => record.meta)
-    .map(record => record.meta)
-  for (const meta of routeMeta) {
-    const requiredQuizStatus = meta.requiredQuizStatus
-    if (requiredQuizStatus) {
-      const currentStatus = store.getters['quiz/status']
-      if (requiredQuizStatus !== currentStatus) {
-        const redirectTarget = meta.redirect || {name: 'game'}
-        redirectTarget.replace = true
-        next(redirectTarget)
-        return
-      }
+    {
+      path: '/',
+      component: NarrowLayout,
+      children: [
+        {
+          name: 'intro',
+          component: Intro,
+          path: '/'
+        },
+        {
+          name: 'won',
+          component: WonView,
+          path: '/won',
+        },
+        {
+          name: 'lost',
+          component: LostView,
+          path: '/lost',
+        }
+      ]
     }
-  }
-
-  next() // make sure to always call next()!
+  ]
 })
 
 export default router
