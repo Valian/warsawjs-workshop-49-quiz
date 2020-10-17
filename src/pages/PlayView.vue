@@ -1,5 +1,5 @@
 <template>
-  <div class="box is-fullwidth title" v-if="currentRound === null">Loading...</div>
+  <div class="box has-text-centered title" v-if="currentRound === null">Loading...</div>
   <PlayLayout v-else>
     <template #title>
       <div class="has-text-centered">
@@ -28,80 +28,72 @@
 </template>
 
 <script>
-  import QuestionsWindow from '../components/QuestionsBar.vue'
-  import PlayWindow from '../components/Game.vue'
-  import PlayLayout from '../components/PlayLayout.vue'
-  import {REWARDS, STATUSES} from '../const'
-  import {getQuestions} from '../api';
-  import {delay} from '../utils';
+import { ref, computed, watch } from 'vue'
+import QuestionsWindow from '../components/QuestionsBar.vue'
+import PlayWindow from '../components/Game.vue'
+import PlayLayout from '../components/PlayLayout.vue'
+import {REWARDS, STATUSES} from '../const'
+import {getQuestions} from '../api';
+import {delay} from '../utils';
+import {useRouter} from 'vue-router';
 
-  export default {
-    components: { QuestionsWindow, PlayWindow, PlayLayout },
-    created() {
-      if (this.currentRound === null) this.initGame()
-    },
-    data() {
-      return {
-        cash: 0,
-        currentRound: null,
-        status: STATUSES.NOT_STARTED,
-        rawQuestions: []
-      }
-    },
-    computed: {
-      maxRounds() {
-        return Math.min(REWARDS.length, this.questions.length)
-      },
-      questions() {
-        return this.rawQuestions
-        .slice(0, this.maxRounds)
-        .map((q, number) => ({
-          ...q,
-          reward: REWARDS[number],
-          isAnswered: number < this.currentRound
-        }))
-      },
-      currentQuestion() {
-        return this.questions[this.currentRound]
-      }
-    },
-    methods: {
-      initGame() {
-        return getQuestions(10).then(questions => {
-          this.cash = 0
-          this.currentRound = 0
-          this.rawQuestions = questions
-          this.status = STATUSES.PLAYING
-        })
-      },
-      answerQuestion(answerNumber) {
-        return delay(Math.random() * 500 + 500).then(() => {
-          if (this.currentQuestion.correctAnswer === answerNumber) {
-            this.cash = this.currentQuestion.reward
-            if (this.currentRound < this.maxRounds) {
-              this.currentRound += 1
-            }
-            if (this.currentRound + 1 === this.maxRounds) {
-              this.status = STATUSES.WON
-            }
-          } else {
-            this.status = STATUSES.LOST
+export default {
+  components: { QuestionsWindow, PlayWindow, PlayLayout },
+  setup() {
+    const router = useRouter()
+
+    const cash = ref(0)
+    const currentRound = ref(null)
+    const status = ref(STATUSES.NOT_STARTED)
+    const rawQuestions = ref([])
+
+    const maxRounds = computed(() => Math.min(REWARDS.length, rawQuestions.value.length))
+    const questions = computed(() => rawQuestions.value
+      .slice(0, maxRounds.value)
+      .map((q, number) => ({
+        ...q,
+        reward: REWARDS[number],
+        isAnswered: number < currentRound.value
+      }))
+    )
+    const currentQuestion = computed(() => questions.value[currentRound.value])
+
+    watch(status, curr => {
+      if (curr === STATUSES.WON) router.push({name: 'won'})
+      if (curr === STATUSES.LOST) router.push({name: 'lost'})
+    })
+
+    getQuestions(10).then(questions => {
+      currentRound.value = 0
+      rawQuestions.value = questions
+      status.value = STATUSES.PLAYING
+    })
+
+    const submitAnswer = answerNumber => delay(Math.random() * 500 + 500)
+      .then(() => {
+        if (currentQuestion.value.correctAnswer === answerNumber) {
+          cash.value = currentQuestion.value.reward
+          if (currentRound.value < maxRounds.value) currentRound.value += 1
+          if (currentRound.value + 1 === maxRounds.value) {
+            status.value = STATUSES.WON
           }
-        })
-      },
-      submitAnswer (number) {
-        return this.answerQuestion(number)
-          .then(() => {
-            if (this.status === STATUSES.WON) {
-              this.$router.push({name: 'won'})
-            }
-            if (this.status === STATUSES.LOST) {
-              this.$router.push({name: 'lost'})
-            }
-          })
+        } else {
+        status.value = STATUSES.LOST
       }
+     })
+
+    return {
+      cash,
+      currentRound,
+      status,
+      rawQuestions,
+      maxRounds,
+      questions,
+      currentQuestion,
+      submitAnswer
     }
   }
+}
 </script>
 
 <style>
